@@ -33,6 +33,7 @@
             // 
             // watcherServiceProcessInstaller
             // 
+            this.watcherServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.watcherServiceProcessInstaller.Password = null;
             this.watcherServiceProcessInstaller.Username = null;
             // 
