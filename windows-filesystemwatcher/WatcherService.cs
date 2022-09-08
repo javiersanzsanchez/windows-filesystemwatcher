@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,9 +15,16 @@ namespace windows_filesystemwatcher
 {
     public partial class WatcherService : ServiceBase
     {
+        private Boolean writeOnFile = true;
+        private Boolean sendQueueMessage = true;
+
+        private MessageLoader messageLoader = null;
+
         public WatcherService()
         {
             InitializeComponent();
+
+            messageLoader = new MessageLoader();
 
             var watcher = new FileSystemWatcher(@"C:\Users\Javier\Desktop\WatchedFolder");
 
@@ -43,15 +51,14 @@ namespace windows_filesystemwatcher
         protected override void OnStart(string[] args)
         {
             WriteToFile("Service is started at " + DateTime.Now);
+            
         }
+
         protected override void OnStop()
         {
             WriteToFile("Service is stopped at " + DateTime.Now);
         }
-        private void OnElapsedTime(object source, ElapsedEventArgs e)
-        {
-            WriteToFile("Service is recall at " + DateTime.Now);
-        }
+
         private void OnChanged(object sender, FileSystemEventArgs e)
         {
             if (e.ChangeType != WatcherChangeTypes.Changed)
@@ -61,6 +68,8 @@ namespace windows_filesystemwatcher
             //Console.WriteLine($"Changed: {e.FullPath}");
 
             WriteToFile($"Changed: {e.FullPath}");
+
+            SendQueueMessage(e);
         }
 
         private void OnCreated(object sender, FileSystemEventArgs e)
@@ -68,12 +77,16 @@ namespace windows_filesystemwatcher
             string value = $"Created: {e.FullPath}";
             //Console.WriteLine(value);
             WriteToFile(value);
+
+            SendQueueMessage(e);
         }
 
         private void OnDeleted(object sender, FileSystemEventArgs e)
         {
             //Console.WriteLine($"Deleted: {e.FullPath}");
             WriteToFile($"Deleted: {e.FullPath}");
+
+            SendQueueMessage(e);
         }
 
         private void OnRenamed(object sender, RenamedEventArgs e)
@@ -84,6 +97,8 @@ namespace windows_filesystemwatcher
             WriteToFile("Renamed:");
             WriteToFile($"    Old: {e.OldFullPath}");
             WriteToFile($"    New: {e.FullPath}");
+
+            SendQueueMessage(e);
         }
 
         private void OnError(object sender, ErrorEventArgs e) =>
@@ -104,8 +119,12 @@ namespace windows_filesystemwatcher
                 PrintException(ex.InnerException);
             }
         }
-        public void WriteToFile(string Message)
+
+        private void WriteToFile(string Message)
         {
+            if (!writeOnFile)
+                return;
+
             string path = AppDomain.CurrentDomain.BaseDirectory + "\\Logs";
             if (!Directory.Exists(path))
             {
@@ -127,6 +146,14 @@ namespace windows_filesystemwatcher
                     sw.WriteLine(Message);
                 }
             }
+        }
+
+        private void SendQueueMessage(FileSystemEventArgs e)
+        {
+            if (!sendQueueMessage)
+                return;
+
+            this.messageLoader.SendPrivate(e);
         }
     }
 }
