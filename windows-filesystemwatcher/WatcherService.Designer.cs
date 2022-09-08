@@ -1,6 +1,6 @@
 ﻿namespace windows_filesystemwatcher
 {
-    partial class Service1
+    partial class WatcherService
     {
         /// <summary> 
         /// Variable del diseñador necesaria.
