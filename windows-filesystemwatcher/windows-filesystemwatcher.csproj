@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="WinAPI.cs" />
     <Compile Include="WatcherQueueMessage.cs" />
     <Compile Include="MessageLoader.cs" />
     <Compile Include="ServiceInstaller.cs">

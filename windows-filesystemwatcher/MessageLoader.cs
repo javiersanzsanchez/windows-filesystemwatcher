@@ -22,17 +22,12 @@ namespace windows_filesystemwatcher
         }
 
         // References private queues.
-        public void SendPrivate()
-        {
-            myQueue.Send("Private queue by path name.");
-        }
-
-        // References private queues.
         public void SendPrivate(FileSystemEventArgs e)
         {
-            myQueue.Send(Newtonsoft.Json.JsonConvert.SerializeObject(e));
+            WatcherQueueMessage messageToQueue = new WatcherQueueMessage(e);
+            myQueue.Send(messageToQueue.Serialized());
         }
 
-
     }
+
 }
