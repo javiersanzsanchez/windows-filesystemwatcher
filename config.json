@@ -1,0 +1,7 @@
+{
+  "logLevel": "error",
+  "debounceSeconds": 3,
+  "maxFileSizeMB": 95,
+  "splitLargeFiles": true,
+  "programs": []
+}
